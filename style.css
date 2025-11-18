@@ -1178,6 +1178,11 @@ html.no-js .wrapper:before {
   width: clamp(120px, 16vw, 240px);
   z-index: 5;
 }
+.HeroAvatar picture {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 .HeroAvatar img {
   display: block;
   width: 100%;
@@ -1219,6 +1224,8 @@ html.is-loading .HeroAvatar--inline {
   .HeroAvatar--inline {
     top: auto;
     width: clamp(155px, 40vw, 120px);
+    bottom: 6%;
+    transform: translate(-50%, 0);
   }
 }
 @media (max-width: 519.98px) {
