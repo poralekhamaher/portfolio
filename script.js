@@ -2186,7 +2186,7 @@
                             number: this.element.querySelector(".Preloader__number"),
                             percent: this.element.querySelector(".Preloader__percent"),
                             line: document.querySelector(".Preloader__line")
-                        }, this.progress = 0, this.steps = [0, .17, .24, .41, .58, .7, .89, .94, 1], this.interval = null, rn.config({
+                        }, this.progress = 0, this.interval = null, rn.config({
                             force3D: !0
                         }), rn.set([this.elements.number, this.elements.percent], {
                             y: 0,
@@ -2200,16 +2200,29 @@
                             ease: "power1.out"
                         })
                     }
-                    startInterval() {
-                        clearInterval(this.interval);
-                        let t = 0;
-                        this.interval = setInterval((() => {
-                            t++, this.progress = this.steps[t], this.updateProgress(), 1 === this.progress && (clearInterval(this.interval), this.onLoaded())
-                        }), 150)
+                    startLoading() {
+                        const t = Array.from(document.images || []);
+                        let e = !1,
+                            i = 0,
+                            r = t.length || 1;
+                        const n = () => {
+                                e || (e = !0, this.progress = 1, this.updateProgress(), this.onLoaded())
+                            },
+                            s = () => {
+                                if (e) return;
+                                i += 1, this.progress = Math.min(i / r, 1), this.updateProgress(), i >= r && n()
+                            };
+                        if (!t.length) return void n();
+                        t.forEach((t => {
+                            const e = t.currentSrc || t.src;
+                            if (!e) return void s();
+                            const i = new Image;
+                            i.onload = s, i.onerror = s, i.src = e
+                        })), setTimeout((() => n()), 5e3)
                     }
                     show() {
                         this.animateIn().then((() => {
-                            this.startInterval()
+                            this.startLoading()
                         }))
                     }
                     onLoaded() {
@@ -2373,8 +2386,22 @@
                     onClick(t) {
                         t.preventDefault();
                         const e = t.currentTarget.getAttribute("data-target") || t.currentTarget.getAttribute("href"),
-                            r = t.currentTarget.getAttribute("data-scroll-speed");
-                        this.scrollTo(e, r)
+                            r = t.currentTarget.getAttribute("data-scroll-speed"),
+                            o = 48;
+                        if (!this.isSmooth) {
+                            const t = "string" == typeof e ? document.querySelector(e) : e instanceof window.HTMLElement ? e : null;
+                            return void(t ? (t.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start"
+                            }), window.scrollBy({
+                                top: -o,
+                                behavior: "smooth"
+                            })) : window.scrollTo({
+                                top: 0,
+                                behavior: "smooth"
+                            }))
+                        }
+                        this.scrollTo(e, r, o)
                     }
                     onKeyDown(t) {
                         if (t.keyCode === Sn) requestAnimationFrame((() => {
@@ -2399,16 +2426,30 @@
                     update() {
                         this.isSmooth && (this.scroller.current += (this.scroller.target - this.scroller.current) * this.scroller.ease, this.scroller.current = Math.floor(this.scroller.current), this.scroller.current < .1 && (this.scroller.current = 0), Math.abs(this.scroller.target - this.scroller.current) < .05 && (this.scroller.current = this.scroller.target), this.element.style.transform = `translate3d(0, ${-this.scroller.current}px, 0)`)
                     }
-                    scrollTo(t, e) {
+                    scrollTo(t, e, o = 0) {
                         let r = 0,
-                            i = null;
-                        t instanceof window.HTMLElement ? (i = t, r = t.getBoundingClientRect().top + this.scroller.target) : "number" != typeof t && isNaN(t) ? (i = document.querySelector(t), r = i.getBoundingClientRect().top + this.scroller.target) : r = t, rn.to(window, {
-                            duration: e || 1,
+                            i = null,
+                            n = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                        t instanceof window.HTMLElement ? (i = t, r = t.getBoundingClientRect().top + n) : "number" != typeof t && isNaN(t) ? (i = document.querySelector(t), r = i ? i.getBoundingClientRect().top + n : 0) : r = t, r = Math.max(0, r - o);
+                        const a = Math.min(Math.max(parseFloat(e) || 3.5, 1.5), 5),
+                            l = .52;
+                        if (!this.isSmooth) return void rn.to(window, {
+                            delay: l,
+                            duration: a,
+                            scrollTo: {
+                                y: r,
+                                autoKill: !1
+                            },
+                            ease: "power2.inOut"
+                        });
+                        rn.to(window, {
+                            delay: l,
+                            duration: a,
                             scrollTo: {
                                 y: r,
                                 autoKill: !0
                             },
-                            ease: "power2",
+                            ease: "power2.inOut",
                             onComplete: () => {
                                 i && i.focus()
                             }
