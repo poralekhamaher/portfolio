@@ -1609,6 +1609,28 @@ html:not(.no-js) .Header .s-labeur.is-shown > :nth-child(3) {
 .About__line__end-year {
   margin-right: 0;
 }
+.About__line__title,
+.About__line__start-year,
+.About__line__end-year {
+  word-break: break-word;
+}
+@media (max-width: 639.98px) {
+  .About__line {
+    align-items: start;
+    column-gap: 1.2rem;
+    grid-template-columns: minmax(0, 2.4fr) minmax(0, 2.1fr) minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+  .About__line__title,
+  .About__line__start-year,
+  .About__line__end-year {
+    white-space: normal;
+  }
+  /* Force the date column to wrap year/month on narrow screens */
+  .About__line span:nth-of-type(3) {
+    max-width: 6ch;
+    line-height: 1.3;
+  }
+}
 .Works {
   padding-bottom: 21.6666666667vw;
   padding-top: 2.9166666667vw;

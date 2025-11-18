@@ -2351,18 +2351,21 @@
                     constructor(t) {
                         this.element = t, this.elements = {
                             anchors: document.querySelectorAll('[data-scroll="scrollto"]')
-                        }, this.scroller = {
-                            ease: .08,
-                            current: 0,
-                            target: 0,
-                            documentHeight: 0,
-                            windowHeight: 0,
-                            limit: 0
-                        }, this.isSmooth = !h, this.init()
-                    }
-                    init() {
-                        window.scrollTo(0, 0), this.element.style.transform = "translate3d(0,0,0)", this.addEvents(), this.resize(), this.isSmooth && (document.documentElement.classList.add("has-smooth-scroll"), this.update())
-                    }
+                          }, this.scroller = {
+                              ease: .08,
+                              current: 0,
+                              target: 0,
+                              documentHeight: 0,
+                              windowHeight: 0,
+                              limit: 0
+                          };
+                          const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+                              scrollMode = this.element.dataset.smoothScroll;
+                          this.isSmooth = !h && !prefersReducedMotion && "native" !== scrollMode, this.init()
+                      }
+                      init() {
+                          window.scrollTo(0, 0), this.addEvents(), this.resize(), this.isSmooth ? (this.element.style.transform = "translate3d(0,0,0)", document.documentElement.classList.add("has-smooth-scroll"), this.update()) : (this.element.style.transform = "", document.documentElement.classList.remove("has-smooth-scroll"))
+                      }
                     addEvents() {
                         window.addEventListener("keydown", this.onKeyDown.bind(this));
                         for (let t = 0; t < this.elements.anchors.length; t++) this.elements.anchors[t].addEventListener("click", this.onClick.bind(this))
@@ -2383,12 +2386,12 @@
                     onScroll() {
                         100 < window.scrollY ? document.documentElement.classList.add("has-scrolled") : document.documentElement.classList.remove("has-scrolled"), this.scroller.target = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
                     }
-                    updateSizes() {
-                        this.scroller.documentHeight = this.element.clientHeight, this.scroller.windowHeight = window.innerHeight, document.body.style.height = this.scroller.documentHeight + "px"
-                    }
+                      updateSizes() {
+                          this.scroller.documentHeight = this.element.clientHeight, this.scroller.windowHeight = window.innerHeight, document.body.style.height = this.isSmooth ? this.scroller.documentHeight + "px" : ""
+                      }
                     resize() {
                         setTimeout((() => {
-                            this.updateSizes(), this.scroller.limit = this.element.clientHeight - window.innerHeight;
+                              this.updateSizes(), this.scroller.limit = this.isSmooth ? this.element.clientHeight - window.innerHeight : 0;
                             let t = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
                             this.scroller.current = t, this.scroller.target = t
                         }), 50)
