@@ -284,6 +284,10 @@ html.is-loading .js-scroll,
 html.is-ready .js-scroll {
   visibility: visible;
 }
+html.is-ready,
+html.is-ready body {
+  overflow-y: auto !important;
+}
 @font-face {
   font-display: swap;
   font-family: PP Editorial New;

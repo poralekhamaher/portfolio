@@ -2908,7 +2908,7 @@
                         })
                     }
                     onPreloaded() {
-                        document.documentElement.classList.remove("is-loading"), document.documentElement.classList.add("is-ready"), this.resize(), u && (window.scrollTo(0, 1), window.scrollTo(0, 0), window.dispatchEvent(new Event("scroll"))), this.animateIntro()
+                        document.documentElement.classList.remove("is-loading"), document.documentElement.classList.add("is-ready"), document.documentElement.style.overflow = "auto", document.body.style.overflow = "auto", this.resize(), u && (window.scrollTo(0, 1), window.scrollTo(0, 0), window.dispatchEvent(new Event("scroll"))), setTimeout((() => window.dispatchEvent(new Event("scroll"))), 50), this.animateIntro()
                     }
                     onScroll() {
                         this.scroll && this.scroll.onScroll && this.scroll.onScroll()
