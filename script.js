@@ -2384,24 +2384,12 @@
                         for (let t = 0; t < this.elements.anchors.length; t++) this.elements.anchors[t].addEventListener("click", this.onClick.bind(this))
                     }
                     onClick(t) {
-                        t.preventDefault();
                         const e = t.currentTarget.getAttribute("data-target") || t.currentTarget.getAttribute("href"),
                             r = t.currentTarget.getAttribute("data-scroll-speed"),
                             o = 48;
-                        if (!this.isSmooth) {
-                            const t = "string" == typeof e ? document.querySelector(e) : e instanceof window.HTMLElement ? e : null;
-                            return void(t ? (t.scrollIntoView({
-                                behavior: "smooth",
-                                block: "start"
-                            }), window.scrollBy({
-                                top: -o,
-                                behavior: "smooth"
-                            })) : window.scrollTo({
-                                top: 0,
-                                behavior: "smooth"
-                            }))
-                        }
-                        this.scrollTo(e, r, o)
+                        if (!e) return;
+                        if (u) return; // mobile/touch keeps native anchor behavior
+                        t.preventDefault(), this.scrollTo(e, r, o)
                     }
                     onKeyDown(t) {
                         if (t.keyCode === Sn) requestAnimationFrame((() => {
@@ -2431,8 +2419,9 @@
                             i = null,
                             n = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
                         t instanceof window.HTMLElement ? (i = t, r = t.getBoundingClientRect().top + n) : "number" != typeof t && isNaN(t) ? (i = document.querySelector(t), r = i ? i.getBoundingClientRect().top + n : 0) : r = t, r = Math.max(0, r - o);
-                        const a = Math.min(Math.max(parseFloat(e) || 3.5, 1.5), 5),
-                            l = .52;
+                        // Immediate jump scroll on desktop; mobile uses native anchors
+                        const a = 0,
+                            l = 0;
                         if (!this.isSmooth) return void rn.to(window, {
                             delay: l,
                             duration: a,
@@ -2440,7 +2429,7 @@
                                 y: r,
                                 autoKill: !1
                             },
-                            ease: "power2.inOut"
+                            ease: "none"
                         });
                         rn.to(window, {
                             delay: l,
@@ -2449,7 +2438,7 @@
                                 y: r,
                                 autoKill: !0
                             },
-                            ease: "power2.inOut",
+                            ease: "none",
                             onComplete: () => {
                                 i && i.focus()
                             }
